@@ -46,7 +46,7 @@ After installation and configuration, Moodle-RAG can be accessed at `http://loca
 We welcome contributions! If you're interested in helping improve Moodle-RAG, please take a look at our contributing guidelines. To get started, fork the repository and submit a pull request with your proposed changes.
 
 ## Support and Contact
-If you encounter any issues or have questions, please file an issue on the GitHub repository. For more direct support, you can contact the project maintainers at [info@learnbox.de](mailto:contact@example.com).
+If you encounter any issues or have questions, please file an issue on the GitHub repository. For more direct support, you can contact the project maintainers at [contact@example.com](mailto:contact@example.com).
 
 ## License
 Moodle-RAG is released under the [MIT License](LICENSE). See the LICENSE file for more details.

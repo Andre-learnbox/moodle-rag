@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends
 from starlette.requests import Request
 from pydantic import BaseModel
 from typing import Optional
-from langchain_core.prompts import ChatPromptTemplate
+###from langchain_core.prompts import ChatPromptTemplate
 from langchain.prompts import HumanMessagePromptTemplate
 from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers import StrOutputParser
 from operator import itemgetter
 import os
 import re
-from ..models.utils import create_chat_openai_with_base
+###from ..models.utils import create_chat_openai_with_base
 
 router = APIRouter()
 

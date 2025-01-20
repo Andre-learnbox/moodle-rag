@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Initialize app
-app = FastAPI()
+app = FastAPI( )  
 
 # Store resources in app's state so they can be accessed in views
 app.state.EMBEDDINGFUNTION = load_embedding_function()

@@ -1,5 +1,3 @@
-version: '3.1' # specify docker-compose version
-
 services:
   # Runs from the latest release
   moodle-rag:

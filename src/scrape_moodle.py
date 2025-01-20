@@ -2,6 +2,7 @@ import requests
 from pydantic import BaseModel, Field
 from typing import Tuple, List, Optional
 import os
+import json
 
 
 # Function to call Moodle API
@@ -303,3 +304,106 @@ def scrape_moodle_data() -> MoodleSiteInfo:
         course.sections = sections
 
     return site
+
+def write_course_data(file, course: MoodleCourse, indent_level: int = 0):
+    indent = "    " * indent_level
+    file.write(f"{indent}Kurs: {course.name}\n")
+    file.write(f"{indent}ID: {course.id}\n")
+    file.write(f"{indent}URL: {course.url}\n")
+    file.write(f"{indent}Zusammenfassung: {course.summary}\n")
+    
+    if course.sections:
+        file.write(f"{indent}Abschnitte:\n")
+        for section in course.sections:
+            write_section_data(file, section, indent_level + 1)
+            file.write("\n")
+
+def write_section_data(file, section: MoodleCourseSection, indent_level: int):
+    indent = "    " * indent_level
+    file.write(f"{indent}Abschnittsname: {section.name}\n")
+    file.write(f"{indent}Beschreibung: {section.description}\n")
+    
+    if section.modules:
+        file.write(f"{indent}Module:\n")
+        for module in section.modules:
+            write_module_data(file, module, indent_level + 1)
+
+def write_module_data(file, module: MoodleModule, indent_level: int):
+    indent = "    " * indent_level
+    file.write(f"{indent}Modulname: {module.name}\n")
+    file.write(f"{indent}Modultyp: {module.modname}\n")
+    file.write(f"{indent}URL: {module.url}\n")
+    file.write(f"{indent}Beschreibung: {module.description}\n")
+    
+    if module.contents:
+        file.write(f"{indent}Inhalte:\n")
+        for content in module.contents:
+            write_content_data(file, content, indent_level + 1)
+
+def write_content_data(file, content: MoodleModuleContent, indent_level: int):
+    indent = "    " * indent_level
+    file.write(f"{indent}Dateiname: {content.filename}\n")
+    if content.fileurl:
+        file.write(f"{indent}Datei-URL: {content.fileurl}\n")
+    if content.text:
+        file.write(f"{indent}Inhalt: {content.text}\n")
+
+# Main function to scrape data and write to file
+def scrape_moodle_data_to_file():
+    site = get_courses()
+
+    if site is None:
+        print("Keine Daten verfügbar.")
+        return
+
+    for course in site.courses:
+        sections = get_course_sections(course.id)
+        course.sections = sections
+
+    with open("moodle_content.txt", "w", encoding="utf-8") as f:
+        f.write(f"Moodle-Site: {site.name}\n")
+        f.write(f"URL: {site.url}\n")
+        f.write(f"Zusammenfassung: {site.summary}\n\n")
+        
+        if site.courses:
+            f.write(f"Gefundene Kurse: {len(site.courses)}\n\n")
+            for course in site.courses:
+                write_course_data(f, course)
+                f.write("\n" + "="*80 + "\n\n")
+
+    # Zusätzlich JSON-Export für strukturierte Daten
+    with open("moodle_content.json", "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "site": site.asdict(),
+                "courses": [course.asdict() for course in site.courses],
+                "sections": [
+                    section.asdict() 
+                    for course in site.courses 
+                    for section in course.sections
+                ],
+                "modules": [
+                    module.asdict()
+                    for course in site.courses
+                    for section in course.sections
+                    for module in section.modules
+                ],
+                "contents": [
+                    content.asdict()
+                    for course in site.courses
+                    for section in course.sections
+                    for module in section.modules
+                    for content in module.contents
+                ]
+            },
+            f,
+            indent=2,
+            ensure_ascii=False
+        )
+
+# Trigger the scrape
+def main():
+    scrape_moodle_data_to_file()
+
+if __name__ == "__main__":
+    main()
