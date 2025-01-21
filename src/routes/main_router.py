@@ -42,8 +42,10 @@ class Query(BaseModel):
 class Response(BaseModel):
     response: str
 
-
 def get_vectorstore(req: Request):
+    if not hasattr(req.app.state, 'VECTORSTORE'):
+        print("Vectorstore not initialized!")
+        load_vectorstore(req.app.state.EMBEDDINGFUNTION)
     return req.app.state.VECTORSTORE
 
 
