@@ -47,12 +47,34 @@ def get_vectorstore(req: Request):
     return req.app.state.VECTORSTORE
 
 
-@router.post("/chat", response_model=Response)
-def chat(request: Query, vectorstore=Depends(get_vectorstore)):
-    predicted_context = predict_context(request)
-    response = process_query(request, vectorstore, predicted_context)
-    return Response(response=response)
+#@router.post("/chat", response_model=Response)
+#def chat(request: Query, vectorstore=Depends(get_vectorstore)):
+#    predicted_context = predict_context(request)
+#    response = process_query(request, vectorstore, predicted_context)
+#    return Response(response=response)
 
+@router.post("/chat", response_model=Response)
+async def chat(request: Query, vectorstore=Depends(get_vectorstore)):
+    try:
+        print(f"Received request: {request}")
+        
+        predicted_context = predict_context(request)
+        print(f"Predicted context: {predicted_context}")
+        
+        if predicted_context is None:
+            print("Failed to predict context")
+            return Response(response="Sorry, context wasn't correct.")
+            
+        response = process_query(request, vectorstore, predicted_context)
+        print(f"Generated response: {response}")
+        
+        return Response(response=response)
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        # Log the full traceback
+        import traceback
+        print(traceback.format_exc())
+        return Response(response=f"There is following error: {str(e)}")
 
 def process_query(request, vectorstore, predicted_context):
     # Retriever will search for the top_5 most similar documents to the query.
