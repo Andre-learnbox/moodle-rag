@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from src.routes.main_router import router as main_router
 from src.setup import load_embedding_function, load_vectorstore
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -10,6 +11,15 @@ load_dotenv()
 
 # Initialize app
 app = FastAPI( )  
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your Moodle domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Store resources in app's state so they can be accessed in views
 app.state.EMBEDDINGFUNTION = load_embedding_function()
